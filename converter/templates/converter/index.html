@@ -3,7 +3,30 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Markdown to PDF</title>
+  <title>markdowntopdf — Fast, Beautiful Markdown to PDF Converter</title>
+  
+  <meta name="description" content="markdowntopdf is an elegant, minimal, and privacy-first web utility that converts Markdown to publication-ready PDFs in real time. Features live preview, curated typography, custom color accents, and calibrated A4 print styling.">
+  <meta name="keywords" content="markdowntopdf, markdown to pdf, markdown editor, pdf converter, live preview, export pdf, printable markdown, minimal editor">
+  <meta name="author" content="markdowntopdf">
+  <meta name="theme-color" content="#0f172a">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="markdowntopdf">
+  <meta property="og:title" content="markdowntopdf — Fast, Beautiful Markdown to PDF Converter">
+  <meta property="og:description" content="Convert Markdown into clean, beautifully styled PDF documents in your browser with instant live preview.">
+  <meta property="og:image" content="{% static 'converter/logo.svg' %}">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="markdowntopdf — Fast, Beautiful Markdown to PDF Converter">
+  <meta name="twitter:description" content="Convert Markdown into clean, beautifully styled PDF documents in your browser with instant live preview.">
+  <meta name="twitter:image" content="{% static 'converter/logo.svg' %}">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="{% static 'converter/logo.svg' %}">
+  <link rel="apple-touch-icon" href="{% static 'converter/logo.svg' %}">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="{{ fonts_url }}">
@@ -27,38 +50,138 @@
     <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></symbol>
     <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></symbol>
     <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="i-template" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M12 3l1.9 4.8L19 9.8l-4.1 3.5L16 18l-4-2.5-4 2.5 1.1-4.7L5 9.8l5.1-2z"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
   </defs>
 </svg>
 
+<!-- ───────── Top Navigation Bar ───────── -->
+<header class="site-header" role="banner">
+  <div class="header-inner">
+    <div class="brand-group">
+      <a href="/" class="brand" title="markdowntopdf home">
+        <span class="brand-icon-box">
+          <svg class="brand-svg" viewBox="0 0 24 24">
+            <path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" fill="#059669"/>
+            <path d="M6 15V9h2l2.5 3.5L13 9h2v6h-2v-3.5L10.5 15h-1L7 11.5V15z" fill="#fff"/>
+          </svg>
+        </span>
+        <span class="brand-name">markdown<span class="brand-accent">topdf</span></span>
+      </a>
+      <span class="brand-tag">v1.0</span>
+    </div>
+
+    <!-- Live document statistics -->
+    <div class="doc-stats" id="docStats" title="Live document length and reading estimate">
+      <span class="stat-badge"><span id="wordCount">0</span> words</span>
+      <span class="stat-sep">•</span>
+      <span class="stat-badge"><span id="charCount">0</span> chars</span>
+      <span class="stat-sep">•</span>
+      <span class="stat-badge"><span id="readTime">1</span> min read</span>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <!-- Templates Dropdown -->
+      <div class="template-dropdown-wrap">
+        <button type="button" class="btn-ghost" id="templateBtn" aria-haspopup="true" aria-expanded="false" title="Load starter document templates">
+          <svg class="ic"><use href="#i-template"/></svg>
+          <span>Templates</span>
+          <svg class="ic ic-xs"><use href="#i-chev"/></svg>
+        </button>
+        <div class="dropdown-menu" id="templateMenu" hidden>
+          <div class="dropdown-header">Document Presets</div>
+          <button type="button" class="dropdown-item" data-template="sample">
+            <span class="template-name">Default Guide</span>
+            <span class="template-desc">Feature overview &amp; formatting samples</span>
+          </button>
+          <button type="button" class="dropdown-item" data-template="resume">
+            <span class="template-name">Resume / CV</span>
+            <span class="template-desc">Clean single-page career profile</span>
+          </button>
+          <button type="button" class="dropdown-item" data-template="meeting">
+            <span class="template-name">Meeting Notes</span>
+            <span class="template-desc">Agenda, attendees &amp; action checklist</span>
+          </button>
+          <button type="button" class="dropdown-item" data-template="techspec">
+            <span class="template-name">Technical Spec</span>
+            <span class="template-desc">RFC architecture &amp; system constraints</span>
+          </button>
+          <div class="dropdown-sep"></div>
+          <button type="button" class="dropdown-item text-danger" data-template="empty">
+            <span class="template-name">Blank Document</span>
+            <span class="template-desc">Start with an empty canvas</span>
+          </button>
+        </div>
+      </div>
+
+      <button type="button" class="btn-ghost" id="helpBtn" title="Keyboard shortcuts and Markdown cheat sheet">
+        <svg class="ic"><use href="#i-help"/></svg>
+        <span>Cheatsheet</span>
+      </button>
+
+      <button type="button" class="btn-ghost" id="copyMarkdownBtn" title="Copy Markdown to clipboard">
+        <svg class="ic"><use href="#i-copy"/></svg>
+        <span>Copy MD</span>
+      </button>
+
+      <button type="button" class="btn-primary-sm" id="navDownloadBtn" title="Download formatted PDF">
+        <svg class="ic"><use href="#i-download"/></svg>
+        <span>Export PDF</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ───────── Page Heading Bar ───────── -->
+<section class="site-heading-bar">
+  <div class="heading-content">
+    <h1 class="main-heading">Convert Markdown to Publication-Ready PDF</h1>
+    <p class="sub-heading">Draft or paste Markdown, preview live with curated typography &amp; color schemes, and export crisp A4 PDFs with zero setup.</p>
+  </div>
+  <div class="quick-badges">
+    <span class="quick-pill"><svg class="ic-xs"><use href="#i-check"/></svg> 100% In-Memory &amp; Private</span>
+    <span class="quick-pill"><svg class="ic-xs"><use href="#i-check"/></svg> Instant Dual-Pane Preview</span>
+    <span class="quick-pill"><svg class="ic-xs"><use href="#i-check"/></svg> Standard A4 Print Calibration</span>
+  </div>
+</section>
+
+<!-- ───────── Main Editor Card ───────── -->
 <main class="card">
 
   <!-- ───────── Editor ───────── -->
   <section class="pane-editor" aria-label="Markdown editor">
-    <div class="toolbar" role="toolbar">
-      <button class="tb" data-act="bold" title="Bold (Ctrl+B)"><b>B</b></button>
-      <button class="tb" data-act="italic" title="Italic (Ctrl+I)"><i class="serif">I</i></button>
-      <button class="tb" data-act="underline" title="Underline"><u>U</u></button>
-      <button class="tb" data-act="strike" title="Strikethrough"><s>S</s></button>
+    <div class="toolbar" role="toolbar" aria-label="Markdown formatting toolbar">
+      <button type="button" class="tb" data-act="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+      <button type="button" class="tb" data-act="italic" title="Italic (Ctrl+I)"><i class="serif">I</i></button>
+      <button type="button" class="tb" data-act="underline" title="Underline"><u>U</u></button>
+      <button type="button" class="tb" data-act="strike" title="Strikethrough"><s>S</s></button>
       <span class="sep"></span>
-      <button class="tb tb-h" data-act="h1" title="Heading 1">H1</button>
-      <button class="tb tb-h" data-act="h2" title="Heading 2">H2</button>
-      <button class="tb tb-h" data-act="h3" title="Heading 3">H3</button>
+      <button type="button" class="tb tb-h" data-act="h1" title="Heading 1">H1</button>
+      <button type="button" class="tb tb-h" data-act="h2" title="Heading 2">H2</button>
+      <button type="button" class="tb tb-h" data-act="h3" title="Heading 3">H3</button>
       <span class="sep"></span>
-      <button class="tb" data-act="ul" title="Bulleted list"><svg class="ic"><use href="#i-list"/></svg></button>
-      <button class="tb" data-act="tasks" title="Task list"><svg class="ic"><use href="#i-tasks"/></svg></button>
-      <button class="tb" data-act="quote" title="Quote"><svg class="ic"><use href="#i-quote"/></svg></button>
+      <button type="button" class="tb" data-act="ul" title="Bulleted list"><svg class="ic"><use href="#i-list"/></svg></button>
+      <button type="button" class="tb" data-act="tasks" title="Task list"><svg class="ic"><use href="#i-tasks"/></svg></button>
+      <button type="button" class="tb" data-act="quote" title="Quote"><svg class="ic"><use href="#i-quote"/></svg></button>
       <span class="sep"></span>
-      <button class="tb" data-act="code" title="Inline code"><svg class="ic"><use href="#i-code"/></svg></button>
-      <button class="tb" data-act="block" title="Code block"><svg class="ic"><use href="#i-block"/></svg></button>
-      <button class="tb" data-act="link" title="Link (Ctrl+K)"><svg class="ic"><use href="#i-link"/></svg></button>
-      <button class="tb" data-act="image" title="Image"><svg class="ic"><use href="#i-image"/></svg></button>
-      <button class="tb" data-act="hr" title="Horizontal rule"><svg class="ic"><use href="#i-hr"/></svg></button>
+      <button type="button" class="tb" data-act="code" title="Inline code"><svg class="ic"><use href="#i-code"/></svg></button>
+      <button type="button" class="tb" data-act="block" title="Code block"><svg class="ic"><use href="#i-block"/></svg></button>
+      <button type="button" class="tb" data-act="link" title="Link (Ctrl+K)"><svg class="ic"><use href="#i-link"/></svg></button>
+      <button type="button" class="tb" data-act="image" title="Image"><svg class="ic"><use href="#i-image"/></svg></button>
+      <button type="button" class="tb" data-act="hr" title="Horizontal rule"><svg class="ic"><use href="#i-hr"/></svg></button>
       <span class="spacer"></span>
       <span class="sep"></span>
-      <button class="tb-text" id="uploadBtn" title="Upload a .md file"><svg class="ic"><use href="#i-upload"/></svg>Upload</button>
+      <button type="button" class="tb-text dim" id="clearEditorBtn" title="Clear editor content"><svg class="ic"><use href="#i-trash"/></svg>Clear</button>
+      <button type="button" class="tb-text" id="uploadBtn" title="Upload a .md file"><svg class="ic"><use href="#i-upload"/></svg>Upload</button>
       <input type="file" id="fileInput" accept=".md,.markdown,.mdown,.txt,text/markdown,text/plain" hidden>
-      <button class="tb-text dim" data-act="fix" title="Fix common Markdown mistakes"><svg class="ic"><use href="#i-check"/></svg>Fix</button>
-      <button class="tb-text" data-act="beautify" title="Tidy whitespace"><svg class="ic"><use href="#i-beauty"/></svg>Beautify</button>
+      <button type="button" class="tb-text dim" data-act="fix" title="Fix common Markdown mistakes"><svg class="ic"><use href="#i-check"/></svg>Fix</button>
+      <button type="button" class="tb-text" data-act="beautify" title="Tidy whitespace"><svg class="ic"><use href="#i-beauty"/></svg>Beautify</button>
     </div>
     <div class="editor" id="dropzone">
       <div class="gutter" id="gutter" aria-hidden="true"></div>
@@ -70,17 +193,17 @@
   <!-- ───────── Preview ───────── -->
   <section class="pane-preview" aria-label="Preview">
     <article id="preview" class="preview">{{ preview_html|safe }}</article>
-    <div class="wm-foot">Made with Markdown to PDF</div>
+    <div class="wm-foot">Made with markdowntopdf</div>
   </section>
 
   <!-- ───────── Sidebar ───────── -->
-  <aside class="side">
+  <aside class="side" aria-label="Typography and style customization">
     <div class="label">Typeface</div>
     <div class="pills" id="pills">
-      <button class="pill on" data-filter="all">All</button>
-      <button class="pill" data-filter="sans">Sans</button>
-      <button class="pill" data-filter="serif">Serif</button>
-      <button class="pill" data-filter="mono">Mono</button>
+      <button type="button" class="pill on" data-filter="all">All</button>
+      <button type="button" class="pill" data-filter="sans">Sans</button>
+      <button type="button" class="pill" data-filter="serif">Serif</button>
+      <button type="button" class="pill" data-filter="mono">Mono</button>
     </div>
 
     <div class="fonts" id="fonts">
@@ -128,7 +251,96 @@
   </aside>
 </main>
 
-<div class="toast" id="toast" role="status"></div>
+<!-- ───────── Site Footer ───────── -->
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <span class="footer-brand">markdowntopdf</span>
+      <span class="footer-tagline">&mdash; Minimal, privacy-first Markdown to PDF publishing.</span>
+    </div>
+    <div class="footer-center">
+      <span class="privacy-note"><svg class="ic-xs"><use href="#i-shield"/></svg> In-memory processing &bull; Zero telemetry &bull; No database storage</span>
+    </div>
+    <div class="footer-right">
+      <span class="kbd-hint"><kbd>Ctrl</kbd>+<kbd>B</kbd> Bold</span>
+      <span class="kbd-hint"><kbd>Ctrl</kbd>+<kbd>I</kbd> Italic</span>
+      <span class="kbd-hint"><kbd>Ctrl</kbd>+<kbd>K</kbd> Link</span>
+      <button type="button" id="footerShortcutsLink" class="footer-link-btn">Shortcuts &amp; Cheatsheet</button>
+    </div>
+  </div>
+</footer>
+
+<!-- ───────── Cheatsheet & Keyboard Shortcuts Modal ───────── -->
+<div class="modal-backdrop" id="helpModal" hidden role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <h2 id="modalTitle" class="modal-title">Markdown Cheatsheet &amp; Shortcuts</h2>
+        <p class="modal-sub">Quick syntax reference and keyboard combinations for markdowntopdf</p>
+      </div>
+      <button type="button" class="modal-close-btn" id="modalCloseBtn" aria-label="Close dialog">
+        <svg class="ic"><use href="#i-close"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-grid">
+        <div class="modal-col">
+          <h3 class="modal-section-title">Common Formatting</h3>
+          <table class="modal-table">
+            <thead><tr><th>Element</th><th>Markdown Syntax</th></tr></thead>
+            <tbody>
+              <tr><td>Heading 1</td><td><code># Title</code></td></tr>
+              <tr><td>Heading 2</td><td><code>## Section</code></td></tr>
+              <tr><td>Heading 3</td><td><code>### Subsection</code></td></tr>
+              <tr><td>Bold</td><td><code>**bold text**</code></td></tr>
+              <tr><td>Italic</td><td><code>*italicized*</code></td></tr>
+              <tr><td>Strikethrough</td><td><code>~~deleted~~</code></td></tr>
+              <tr><td>Inline Code</td><td><code>`inline`</code></td></tr>
+              <tr><td>Link</td><td><code>[Text](https://url)</code></td></tr>
+              <tr><td>Image</td><td><code>![Alt](image.png)</code></td></tr>
+              <tr><td>Quote</td><td><code>&gt; Quote block</code></td></tr>
+              <tr><td>Horizontal Rule</td><td><code>---</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-col">
+          <h3 class="modal-section-title">Lists &amp; Tables</h3>
+          <table class="modal-table">
+            <thead><tr><th>Element</th><th>Markdown Syntax</th></tr></thead>
+            <tbody>
+              <tr><td>Bulleted List</td><td><code>- Item 1<br>- Item 2</code></td></tr>
+              <tr><td>Numbered List</td><td><code>1. First<br>2. Second</code></td></tr>
+              <tr><td>Task List</td><td><code>- [ ] To do<br>- [x] Done</code></td></tr>
+              <tr><td>Code Block</td><td><code>```python<br>print("hi")<br>```</code></td></tr>
+              <tr><td>Table</td><td><code>| Col 1 | Col 2 |<br>| :--- | :--- |<br>| Data 1 | Data 2 |</code></td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="modal-section-title mt-sec">Keyboard Shortcuts</h3>
+          <table class="modal-table">
+            <thead><tr><th>Action</th><th>Shortcut</th></tr></thead>
+            <tbody>
+              <tr><td>Bold Selection</td><td><kbd>Ctrl</kbd> + <kbd>B</kbd> (or <kbd>⌘</kbd><kbd>B</kbd>)</td></tr>
+              <tr><td>Italic Selection</td><td><kbd>Ctrl</kbd> + <kbd>I</kbd> (or <kbd>⌘</kbd><kbd>I</kbd>)</td></tr>
+              <tr><td>Insert Link</td><td><kbd>Ctrl</kbd> + <kbd>K</kbd> (or <kbd>⌘</kbd><kbd>K</kbd>)</td></tr>
+              <tr><td>Print / Save PDF</td><td><kbd>Ctrl</kbd> + <kbd>P</kbd> (or <kbd>⌘</kbd><kbd>P</kbd>)</td></tr>
+              <tr><td>Close Dialog</td><td><kbd>Esc</kbd></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <span class="modal-hint">Choose <strong>Save as PDF</strong> in your browser's print dialog to download.</span>
+      <button type="button" class="btn-primary-sm" id="modalOkBtn">Got it</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- JSON payload of template presets -->
+<script id="templatesData" type="application/json">{{ templates_json|safe }}</script>
 <script src="{% static 'converter/app.js' %}"></script>
 </body>
 </html>

@@ -1,0 +1,17 @@
+.git
+.gitignore
+.venv
+env
+venv
+ENV
+__pycache__
+*.py[cod]
+*$py.class
+*.log
+*.sqlite3
+staticfiles
+.DS_Store
+Thumbs.db
+.vscode
+.idea
+README.md

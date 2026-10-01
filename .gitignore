@@ -1,1 +1,23 @@
-env/*
+# Environments
+.venv/
+env/
+venv/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Static collected in production
+staticfiles/
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# IDE and OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

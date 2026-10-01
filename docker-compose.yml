@@ -1,0 +1,15 @@
+services:
+  markdowntopdf:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: markdowntopdf:latest
+    container_name: markdowntopdf
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_DEBUG=0
+      - DJANGO_ALLOWED_HOSTS=*
+      - DJANGO_SECRET_KEY=markdowntopdf-production-secret-key-change-if-needed
+      - PORT=8000
