@@ -1,0 +1,134 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Markdown to PDF</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="{{ fonts_url }}">
+  <link rel="stylesheet" href="{% static 'converter/app.css' %}">
+</head>
+<body data-preview-url="{% url 'converter:preview' %}" data-upload-url="{% url 'converter:upload' %}">
+{% csrf_token %}
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></symbol>
+    <symbol id="i-tasks" viewBox="0 0 24 24"><path d="M10 6h11M10 12h11M10 18h11"/><path d="M3 6l1.5 1.5L7 5M3 12l1.5 1.5L7 11M3 18l1.5 1.5L7 17"/></symbol>
+    <symbol id="i-quote" viewBox="0 0 24 24"><path d="M7 7h4v5a4 4 0 0 1-4 4"/><path d="M15 7h4v5a4 4 0 0 1-4 4"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14"/></symbol>
+    <symbol id="i-block" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M10 10l-2 2 2 2M14 10l2 2-2 2"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="1.5"/><path d="M21 15l-5-5L5 21"/></symbol>
+    <symbol id="i-hr" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-beauty" viewBox="0 0 24 24"><path d="M3 6h18M3 12h12M3 18h18"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  </defs>
+</svg>
+
+<main class="card">
+
+  <!-- ───────── Editor ───────── -->
+  <section class="pane-editor" aria-label="Markdown editor">
+    <div class="toolbar" role="toolbar">
+      <button class="tb" data-act="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+      <button class="tb" data-act="italic" title="Italic (Ctrl+I)"><i class="serif">I</i></button>
+      <button class="tb" data-act="underline" title="Underline"><u>U</u></button>
+      <button class="tb" data-act="strike" title="Strikethrough"><s>S</s></button>
+      <span class="sep"></span>
+      <button class="tb tb-h" data-act="h1" title="Heading 1">H1</button>
+      <button class="tb tb-h" data-act="h2" title="Heading 2">H2</button>
+      <button class="tb tb-h" data-act="h3" title="Heading 3">H3</button>
+      <span class="sep"></span>
+      <button class="tb" data-act="ul" title="Bulleted list"><svg class="ic"><use href="#i-list"/></svg></button>
+      <button class="tb" data-act="tasks" title="Task list"><svg class="ic"><use href="#i-tasks"/></svg></button>
+      <button class="tb" data-act="quote" title="Quote"><svg class="ic"><use href="#i-quote"/></svg></button>
+      <span class="sep"></span>
+      <button class="tb" data-act="code" title="Inline code"><svg class="ic"><use href="#i-code"/></svg></button>
+      <button class="tb" data-act="block" title="Code block"><svg class="ic"><use href="#i-block"/></svg></button>
+      <button class="tb" data-act="link" title="Link (Ctrl+K)"><svg class="ic"><use href="#i-link"/></svg></button>
+      <button class="tb" data-act="image" title="Image"><svg class="ic"><use href="#i-image"/></svg></button>
+      <button class="tb" data-act="hr" title="Horizontal rule"><svg class="ic"><use href="#i-hr"/></svg></button>
+      <span class="spacer"></span>
+      <span class="sep"></span>
+      <button class="tb-text" id="uploadBtn" title="Upload a .md file"><svg class="ic"><use href="#i-upload"/></svg>Upload</button>
+      <input type="file" id="fileInput" accept=".md,.markdown,.mdown,.txt,text/markdown,text/plain" hidden>
+      <button class="tb-text dim" data-act="fix" title="Fix common Markdown mistakes"><svg class="ic"><use href="#i-check"/></svg>Fix</button>
+      <button class="tb-text" data-act="beautify" title="Tidy whitespace"><svg class="ic"><use href="#i-beauty"/></svg>Beautify</button>
+    </div>
+    <div class="editor" id="dropzone">
+      <div class="gutter" id="gutter" aria-hidden="true"></div>
+      <textarea id="editor" spellcheck="false" wrap="off" aria-label="Markdown source">{{ sample }}</textarea>
+      <div class="drop-hint">Drop a .md file to load it</div>
+    </div>
+  </section>
+
+  <!-- ───────── Preview ───────── -->
+  <section class="pane-preview" aria-label="Preview">
+    <article id="preview" class="preview">{{ preview_html|safe }}</article>
+    <div class="wm-foot">Made with Markdown to PDF</div>
+  </section>
+
+  <!-- ───────── Sidebar ───────── -->
+  <aside class="side">
+    <div class="label">Typeface</div>
+    <div class="pills" id="pills">
+      <button class="pill on" data-filter="all">All</button>
+      <button class="pill" data-filter="sans">Sans</button>
+      <button class="pill" data-filter="serif">Serif</button>
+      <button class="pill" data-filter="mono">Mono</button>
+    </div>
+
+    <div class="fonts" id="fonts">
+      {% for f in typefaces %}
+      <button type="button" class="font{% if forloop.first %} on{% endif %}" data-family="{{ f.family }}" data-cat="{{ f.category }}">
+        <span class="font-text">
+          <span class="font-name" style="font-family: {{ f.family }}">{{ f.name }}</span>
+          <span class="font-hint">{{ f.hint }}</span>
+        </span>
+        <span class="font-aa" style="font-family: {{ f.family }}">Aa</span>
+      </button>
+      {% endfor %}
+    </div>
+
+    <div class="label mt">Colours</div>
+    <div class="swatches" id="swatches">
+      {% for c in colours %}
+      <button type="button" class="sw{% if forloop.first %} on{% endif %}" data-accent="{{ c.accent }}" title="{{ c.name }}" aria-label="{{ c.name }}">
+        <i style="background:#1e293b"></i><i style="background:#0f172a"></i><i style="background:{{ c.accent }}"></i>
+      </button>
+      {% endfor %}
+    </div>
+
+    <button type="button" class="tune" id="tune" aria-expanded="false">
+      <span><span class="tune-title">Fine-tune styles</span><span class="tune-sub">Body size &amp; line spacing</span></span>
+      <svg class="ic"><use href="#i-chev"/></svg>
+    </button>
+    <div class="tune-panel" id="tunePanel">
+      <label>Font size <output id="sizeOut">16px</output>
+        <input type="range" id="size" min="13" max="20" step="1" value="16"></label>
+      <label>Line spacing <output id="lhOut">1.6</output>
+        <input type="range" id="lh" min="1.3" max="2" step="0.05" value="1.6"></label>
+    </div>
+
+    <label class="wm">
+      <input type="checkbox" id="noWm">
+      <span>
+        <span class="wm-title">Exclude watermark</span>
+        <span class="wm-sub">Remove the small footer watermark from every page</span>
+      </span>
+    </label>
+
+    <button type="button" class="dl" id="download"><svg class="ic"><use href="#i-download"/></svg>Download PDF</button>
+    <p class="dl-note" id="dlNote">Free download includes a watermark</p>
+  </aside>
+</main>
+
+<div class="toast" id="toast" role="status"></div>
+<script src="{% static 'converter/app.js' %}"></script>
+</body>
+</html>
